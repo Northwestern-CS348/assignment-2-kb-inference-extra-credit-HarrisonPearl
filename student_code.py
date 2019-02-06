@@ -141,7 +141,67 @@ class KnowledgeBase(object):
             string explaining hierarchical support from other Facts and rules
         """
         ####################################################
-        # Student code goes here
+
+
+
+        if isinstance(fact_or_rule, Fact):
+            if fact_or_rule in self.facts:
+                res = self.kb_makestr(fact_or_rule)
+                if(fact_or_rule.supported_by):
+                    res += "\n  SUPPORTED BY\n"
+                    for pair in self._get_fact(fact_or_rule).supported_by:
+                        res += "    " + self.kb_explain(pair[0]) + "\n"
+                        res += "    " + self.kb_explain(pair[1]) + "\n"
+            else:
+                res = "Fact is not in the KB"
+        if isinstance(fact_or_rule, Rule):
+            if fact_or_rule in self.rules:
+                res = self.kb_makestr(fact_or_rule)
+                if (fact_or_rule.supported_by):
+                    res += "\n  SUPPORTED BY\n"
+                    for pair in self._get_rule(fact_or_rule).supported_by:
+                        res += "    " + self.kb_explain(pair[0]) + "\n"
+                        res += "    " + self.kb_explain(pair[1]) + "\n"
+            else:
+                res = "Rule is not in the KB"
+        return res
+
+    def kb_makestr(self, fact_or_rule):
+
+        res = ""
+
+        if isinstance(fact_or_rule, Fact):
+            if fact_or_rule in self.facts:
+                if(self._get_fact(fact_or_rule).asserted):
+                    ass = "ASSERTED"
+                else:
+                    ass = ""
+
+                res = "fact: " + str(fact_or_rule.statement) + " " + ass
+        if isinstance(fact_or_rule, Rule):
+            if fact_or_rule in self.rules:
+                if(self._get_rule(fact_or_rule).asserted):
+                    ass = "ASSERTED"
+                else:
+                    ass = ""
+
+                rstat = ""
+                for s in fact_or_rule.lhs:
+                    rstat += str(s) + ","
+
+                rstat = rstat[:-1]
+                rstat += " -> " + str(fact_or_rule.rhs)
+
+
+                res = "rule: " +  rstat + " " + ass
+        return res
+
+
+
+
+
+
+
 
 
 class InferenceEngine(object):
