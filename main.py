@@ -65,7 +65,7 @@ class KBTest(unittest.TestCase):
         self.KB.facts.extend([f0,f1,f2,f3,f4,f5])
         self.KB.rules.extend([r1,r2,r3,r4,r5])
 
-        self.expected = '\
+        self.expected = "\
 fact: (eats nyala leaves)\n\
   SUPPORTED BY\n\
     fact: (eats herbivore leaves) ASSERTED\n\
@@ -82,7 +82,7 @@ fact: (eats nyala leaves)\n\
       SUPPORTED BY\n\
         fact: (eats nyala plantBasedFood) ASSERTED\n\
         rule: ((eats ?x plantBasedFood), (isa ?y plantBasedFood)) -> (eats ?x ?y) ASSERTED\
-'
+"
         actual = self.KB.kb_explain(read.parse_input("fact: (eats nyala leaves)"))
         self.compare(self.expected, actual)
 

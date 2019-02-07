@@ -1,4 +1,4 @@
-import read, copy
+import read, copy, textwrap
 from util import *
 from logical_classes import *
 
@@ -142,29 +142,65 @@ class KnowledgeBase(object):
         """
         ####################################################
 
-
+        res = ""
+        rfact_or_rule = self._get_fact(fact_or_rule)
 
         if isinstance(fact_or_rule, Fact):
             if fact_or_rule in self.facts:
-                res = self.kb_makestr(fact_or_rule)
-                if(fact_or_rule.supported_by):
-                    res += "\n  SUPPORTED BY\n"
-                    for pair in self._get_fact(fact_or_rule).supported_by:
-                        res += "    " + self.kb_explain(pair[0]) + "\n"
-                        res += "    " + self.kb_explain(pair[1]) + "\n"
+                rfact_or_rule = self._get_fact(fact_or_rule)
+                res = self.kb_makestr(rfact_or_rule) + "\n"
+                if rfact_or_rule.supported_by:
+                    for pair in rfact_or_rule.supported_by:
+                        res += "  SUPPORTED BY\n"
+                        res += self.kb_indent(pair[0], 1)
+                        res += self.kb_indent(pair[1], 1)
             else:
                 res = "Fact is not in the KB"
         if isinstance(fact_or_rule, Rule):
             if fact_or_rule in self.rules:
-                res = self.kb_makestr(fact_or_rule)
-                if (fact_or_rule.supported_by):
-                    res += "\n  SUPPORTED BY\n"
-                    for pair in self._get_rule(fact_or_rule).supported_by:
-                        res += "    " + self.kb_explain(pair[0]) + "\n"
-                        res += "    " + self.kb_explain(pair[1]) + "\n"
+                rfact_or_rule = self._get_rule(fact_or_rule)
+                res = self.kb_makestr(rfact_or_rule) + "\n"
+                if rfact_or_rule.supported_by:
+                    for pair in rfact_or_rule.supported_by:
+                        res += "  SUPPORTED BY\n"
+                        res += self.kb_indent(pair[0], 1)
+                        res += self.kb_indent(pair[1], 1)
+            else:
+                res = "Rule is not in the KB"
+        print(res)
+        return res
+
+    def kb_indent(self, fr, depth):
+        indent = " " * 4 * depth
+        res = ""
+        if isinstance(fr, Fact):
+            if fr in self.facts:
+                frkb = self._get_fact(fr)
+                res = indent + self.kb_makestr(frkb) + "\n"
+                if frkb.supported_by:
+                    for pair in frkb.supported_by:
+                        res += indent + "  SUPPORTED BY\n"
+                        res += self.kb_indent(pair[0], depth + 1)
+                        res += self.kb_indent(pair[1], depth + 1)
+
+            else:
+                res = "Fact is not in the KB"
+        elif isinstance(fr, Rule):
+            if fr in self.rules:
+                frkb = self._get_rule(fr)
+                res = indent + self.kb_makestr(frkb) + "\n"
+
+                if frkb.supported_by:
+                    for pair in frkb.supported_by:
+                        res += indent + "  SUPPORTED BY\n"
+                        res += self.kb_indent(pair[0], depth + 1)
+                        res += self.kb_indent(pair[1], depth + 1)
+
             else:
                 res = "Rule is not in the KB"
         return res
+
+
 
     def kb_makestr(self, fact_or_rule):
 
@@ -185,15 +221,15 @@ class KnowledgeBase(object):
                 else:
                     ass = ""
 
-                rstat = ""
+                rstat = "("
                 for s in fact_or_rule.lhs:
-                    rstat += str(s) + ","
+                    rstat += str(s) + ", "
 
-                rstat = rstat[:-1]
+                rstat = rstat[:-2]
+                rstat += ")"
                 rstat += " -> " + str(fact_or_rule.rhs)
 
-
-                res = "rule: " +  rstat + " " + ass
+                res = "rule: " + rstat + " " + ass
         return res
 
 
